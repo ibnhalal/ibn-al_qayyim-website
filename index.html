@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المكتبة المنهجية للإمام ابن القيم</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg: #050505; --card: #111111; --text: #ffffff; --gold: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.2); --border: rgba(212, 175, 55, 0.15);
+        }
+        .light-mode {
+            --bg: #f9f9f9; --card: #ffffff; --text: #1a1a1a; --gold: #9b7b1d;
+            --gold-glow: rgba(155, 123, 29, 0.1); --border: rgba(155, 123, 29, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: 0.3s; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; overflow-x: hidden; }
+
+        /* --- Header --- */
+        header {
+            position: sticky; top: 0; z-index: 1000; background: var(--bg);
+            padding: 15px 5%; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--gold);
+        }
+        .logo h1 { font-family: 'Amiri', serif; font-size: 1.8rem; color: var(--gold); }
+        .nav-controls { display: flex; gap: 20px; font-size: 1.3rem; color: var(--gold); cursor: pointer; }
+
+        .search-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); display: none; align-items: center; padding: 0 5%;
+        }
+        #searchInput { width: 100%; padding: 10px; background: none; border: none; border-bottom: 2px solid var(--gold); color: var(--text); font-size: 1.2rem; outline: none; }
+
+        /* --- About Section --- */
+        .about-section {
+            background: var(--card); padding: 40px 10%; text-align: center; border-bottom: 1px solid var(--border);
+        }
+        .about-section h2 { font-family: 'Amiri'; color: var(--gold); font-size: 2rem; margin-bottom: 15px; }
+        .about-section p { line-height: 1.8; opacity: 0.8; max-width: 900px; margin: 0 auto; }
+
+        /* --- Grid --- */
+        .books-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px; padding: 40px 5%; max-width: 1300px; margin: 0 auto;
+        }
+        .book-card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 15px;
+            padding: 25px 15px; text-align: center; cursor: pointer; position: relative;
+            opacity: 0; transform: translateY(30px); overflow: hidden;
+        }
+        .book-card.show { opacity: 1; transform: translateY(0); }
+        .book-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 25px var(--gold-glow); }
+        
+        .type-tag { font-size: 0.7rem; color: #000; background: var(--gold); padding: 2px 10px; border-radius: 10px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
+        .book-card h3 { font-family: 'Amiri', serif; font-size: 1.2rem; margin-top: 5px; min-height: 50px; }
+        .vol-info { font-size: 0.75rem; color: var(--gold); margin-top: 10px; display: block; opacity: 0.7; }
+
+        /* --- Overlay (المجلدات) --- */
+        .overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000;
+            display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px;
+        }
+        .vol-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 30px; }
+        .v-btn { background: var(--gold); color: #000; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.1rem; }
+
+        /* --- Footer --- */
+        footer {
+            background: var(--card);
+            padding: 40px 5% 20px;
+            text-align: center;
+            border-top: 2px solid var(--gold);
+            margin-top: 50px;
+        }
+
+        .footer-content h3 {
+            font-family: 'Amiri', serif;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin: 25px 0;
+        }
+
+        .social-links a {
+            color: var(--gold);
+            font-size: 1.8rem;
+            transition: 0.4s ease;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-5px) scale(1.2);
+            color: #ffffff;
+            text-shadow: 0 0 15px var(--gold);
+        }
+
+        .footer-bottom {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><h1>مكتبة الإمام ابن القيم</h1></div>
+    <div class="nav-controls">
+        <i class="fas fa-search" onclick="toggleSearch()"></i>
+        <i class="fas fa-moon" id="themeIcon" onclick="toggleTheme()"></i>
+    </div>
+    <div class="search-overlay" id="searchBar">
+        <input type="text" id="searchInput" placeholder="ابحث عن اسم الكتاب..." oninput="doSearch()">
+        <i class="fas fa-times" onclick="toggleSearch()" style="margin-right:20px; cursor:pointer;"></i>
+    </div>
+</header>
+
+<section class="about-section">
+    <h2>عن الإمام ابن القيم</h2>
+    <p>شمس الدين محمد بن أبي بكر، تلميذ ابن تيمية  وأحد أشهر علماء المسلمين في تربية النفوس وتزكية القلوب. تميزت كتبه بالعلم الغزير والأدب الرفيع.</p>
+</section>
+
+<main class="books-grid" id="mainGrid"></main>
+
+<div class="overlay" id="volOverlay">
+    <h2 id="ovTitle" style="color:var(--gold); font-family:'Amiri'; font-size: 2rem;"></h2>
+    <div class="vol-btns" id="ovBtns"></div>
+    <button onclick="closeOverlay()" style="margin-top:40px; background:none; border:1px solid #fff; color:#fff; padding:10px 30px; border-radius:5px; cursor:pointer;">إغلاق</button>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <h3>مكتبة الإمام ابن القيم الجوزية</h3>
+        <p>بوابة جامعة لكتب امام ابن القيم رحمه الله</p>
+        
+        <div class="social-links">
+            <a href="https://x.com/Albaniy1420" target="_blank" title="تويتر / X"><i class="fab fa-x-twitter"></i></a>
+            <a href="https://t.me/IBN_AlQayyim11" target="_blank" title="تيليجرام"><i class="fab fa-telegram"></i></a>
+            <a href="https://whatsapp.com/channel/0029Vb7x52LL2AU7AA7rGQ15" target="_blank" title="واتساب"><i class="fab fa-whatsapp"></i></a>
+            <a href="mailto:amalbaniy1419@gmail.com" title="البريد الإلكتروني"><i class="fas fa-envelope"></i></a>
+            <a href="http://www.youtube.com/@1431SAHAR" target="_blank" title="يوتيوب"><i class="fab fa-youtube"></i></a>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 جميع الحقوق محفوظة |   لخدمة تراث أهل السنة</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const library = [
+        { t: "الوابل الصيّب", cat: "للقلب", v: 1, links: ["wabel.pdf"] },
+        { t: "الداء والدواء", cat: "للقلب", v: 1, links: ["Ada e.pdf"] },
+        { t: "الفوائد", cat: "للقلب", v: 1, links: ["alfewaid.pdf"] },
+        { t: "كتاب الصلاة", cat: "للصلاة", v: 1, links: ["assala.pdf"] },
+        { t: "الرسالة التبوكية", cat: "للقلب", v: 1, links: ["taboukia.pdf"] },
+        { t: "رسالة إلى أحد إخوانه", cat: "للقلب", v: 1, links: ["Risala.pdf"] },
+        { t: "زاد المعاد", cat: "للسيرة والفقه", v: 7, links: ["zad.pdf", "Zad1.pdf", "Zad 2.pdf", "Zad 3.pdf", "Zad4.pdf", "Zad 5.pdf", "Zad6.pdf", "Zad7.pdf"] },
+        { t: "عُدّة الصابرين", cat: "للقلب", v: 1, links: ["odda.pdf"] },
+        { t: "أيمان القرآن", cat: "للقرآن", v: 1, links: ["90085s.pdf"] },
+        { t: "المَنار المُنيف", cat: "للحديث", v: 1, links: ["mnar.pdf"] },
+        { t: "إغاثة اللهفان", cat: "للقلب", v: 2, links: ["ighasa.pdf", "ighasa1.pdf"] },
+        { t: "مفتاح دار السعادة", cat: "للعلم والتوحيد", v: 2, links: ["miftah.pdf", "miftah 1.pdf"] },
+        { t: "حادي الأرواح", cat: "للقلب", v: 2, links: ["hadi.pdf", "hadi1.pdf"] },
+        { t: "جلاء الأفهام", cat: "للصلاة على النبي", v: 1, links: ["Jelae.pdf"] },
+        { t: "أعلام المُوقّعين", cat: "للفقه", v: 6, links: ["Ielam muqedien 1.pdf", "Ielam muqedien 2.pdf", "Ielam muqedien 3.pdf", "Ielam muqedien 4.pdf", "Ielam muqedien 5.pdf", "Ielam muqedien6.pdf"] },
+        { t: "تحفة المودود", cat: "للأسرة", v: 1, links: ["TuḤFETU-L-MEWDuD.pdf"] },
+        { t: "روضة المحبين", cat: "للقلب", v: 1, links: ["rawdmb.pdf"] },
+        { t: "رفع اليدين", cat: "للصلاة", v: 1, links: ["rafe_yad.pdf"] },
+        { t: "تهذيب سنن أبي داود", cat: "للحديث", v: 3, links: ["Thzib1.pdf", "Thzib 2.pdf", "Thzib 3.pdf"] },
+        { t: "مسألة السماع", cat: "أحكام", v: 1, links: ["samaa.pdf"] },
+        { t: "اجتماع الجيوش", cat: "للعقيدة", v: 1, links: ["ijtma_joyosh.pdf"] },
+        { t: "الفروسية المحمدية", cat: "أحكام", v: 1, links: ["froseya.pdf"] },
+        { t: "بدائع الفوائد", cat: "منوعات", v: 4, links: ["badae_1-4.pdf"] },
+        { t: "الكافية الشافية", cat: "للعقيدة", v: 1, links: ["Nun.pdf"] },
+        { t: "الصواعق المرسلة", cat: "للعقيدة", v: 2, links: ["sewaiq.pdf", "sewaiq1.pdf"] },
+        { t: "كتاب الروح", cat: "للعقيدة", v: 2, links: ["Alruh.pdf", "Alruh1.pdf"] },
+        { t: "شفاء العليل", cat: "للعقيدة", v: 3, links: ["Shifae.pdf", "Shifae.1.pdf", "Shifae.2.pdf"] },
+        { t: "طريق الهجرتين", cat: "للقلب", v: 1, links: ["Hijra.pdf"] },
+        { t: "مدارج السالكين", cat: "للقلب والسلوك", v: 5, links: ["Medarij.pdf","Medarij1.pdf", "Medarij2.pdf", "Medarij 3.pdf", "Medarij4.pdf"] },
+        { t: "الطرق الحكمية", cat: "للقضاء", v: 2, links: ["teriq.pdf", "teriq1.pdf"] },
+        { t: "أحكام أهل الذمة", cat: "للفقه", v: 3, links: ["Ahkam.pdf", "Ahkam1.pdf", "Ahkam2.pdf"] },
+        { t: "هداية الحيارى", cat: "للعقيدة", v: 1, links: ["hidayat.pdf"] }
+    ];
+
+    const grid = document.getElementById('mainGrid');
+
+    function render(filter = "") {
+        grid.innerHTML = "";
+        library.filter(b => b.t.includes(filter)).forEach((b, i) => {
+            const card = document.createElement('div');
+            card.className = 'book-card';
+            card.innerHTML = `<span class="type-tag">${b.cat}</span><h3>${b.t}</h3><span class="vol-info">${b.v > 1 ? b.v + ' مجلدات' : 'مجلد واحد'}</span>`;
+            card.onclick = () => openBook(b);
+            grid.appendChild(card);
+            setTimeout(() => card.classList.add('show'), i * 50);
+        });
+    }
+
+    function openBook(b) {
+        if (b.v > 1) {
+            document.getElementById('ovTitle').innerText = b.t;
+            const btnArea = document.getElementById('ovBtns');
+            btnArea.innerHTML = "";
+            b.links.forEach((link, i) => {
+                btnArea.innerHTML += `<a href="${link}" target="_blank" class="v-btn">المجلد ${i+1}</a>`;
+            });
+            document.getElementById('volOverlay').style.display = 'flex';
+        } else {
+            window.open(b.links[0], "_blank");
+        }
+    }
+
+    function closeOverlay() { document.getElementById('volOverlay').style.display = 'none'; }
+    function toggleSearch() {
+        const bar = document.getElementById('searchBar');
+        bar.style.display = (bar.style.display === 'flex') ? 'none' : 'flex';
+        if(bar.style.display === 'flex') document.getElementById('searchInput').focus();
+    }
+    function doSearch() { render(document.getElementById('searchInput').value); }
+    function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+        document.getElementById('themeIcon').className = document.body.classList.contains('light-mode') ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    window.onload = () => render();
+</script>
+</body>
+</html>
