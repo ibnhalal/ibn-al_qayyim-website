@@ -2,7 +2,7 @@
   "name": "مكتبة الإمام ابن القيم",
   "short_name": "ابن القيم",
   "description": "مكتبة رقمية شاملة لمؤلفات الإمام ابن القيم الجوزية",
-  "start_url": "/ibn-al_qayyim-website/",
+  "start_url": "/ibn-al_qayyim-website/index.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#D4AF37",
