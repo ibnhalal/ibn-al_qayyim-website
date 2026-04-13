@@ -1,13 +1,13 @@
-const cacheName = 'ibn-qayyim-v1';
+const cacheName = 'ibn-qayyim-v2';
 const assets = [
-  '/ibn-al_qayyim-website/',
-  '/ibn-al_qayyim-website/index.html'
+  './',
+  './index.html'
 ];
 
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(cacheName).then(cache => {
-      cache.addAll(assets);
+      return cache.addAll(assets).catch(err => console.log("Cache error:", err));
     })
   );
 });
